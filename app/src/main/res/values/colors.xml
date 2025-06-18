@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Palette -->
+    <color name="colorPrimary">#3F51B5</color>    <!-- Indigo 500 -->
+    <color name="colorPrimaryDark">#303F9F</color>  <!-- Indigo 700 -->
+    <color name="colorAccent">#FF4081</color>     <!-- Pink A200 (for FAB, etc.) -->
+
+    <!-- Background Colors -->
+    <color name="background_light">#F0F2F5</color> <!-- Very light grey -->
+    <color name="background_blue_light">#E3F2FD</color> <!-- Light Blue 50 for Login -->
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>    <!-- Dark Grey -->
+    <color name="text_secondary">#757575</color>  <!-- Medium Grey -->
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Button Colors (examples) -->
+    <color name="button_green">#8BC34A</color>    <!-- Light Green 500 -->
+    <color name="button_orange">#FF8A65</color>   <!-- Deep Orange 300 -->
+    <color name="button_blue">#42A5F5</color>     <!-- Blue 400 -->
+
+    <!-- Card/Surface Colors -->
+    <color name="card_background_light">#FFFFFF</color>
+    <color name="card_border">#E0E0E0</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradient_start_signup">#6A1B9A</color> <!-- Purple 800 -->
+    <color name="gradient_end_signup">#9C27B0</color>   <!-- Purple 500 -->
+    <color name="gradient_start_login">#FF7043</color>  <!-- Deep Orange 400 -->
+    <color name="gradient_end_login">#FFB74D</color>    <!-- Amber 400 -->
+    <color name="gradient_start_header">#3F51B5</color> <!-- Indigo 500 -->
+    <color name="gradient_end_header">#5C6BC0</color>   <!-- Indigo 400 -->
+    <color name="dialog_background">#FFFFFF</color>
+</resources>

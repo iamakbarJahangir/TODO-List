@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Application Theme -->
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#42A5F5</item>
+        <item name="colorPrimaryVariant">#1976D2</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#4CAF50</item>
+        <item name="colorSecondaryVariant">#388E3C</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorError">#D32F2F</item>
+        <item name="colorOnError">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#212121</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Custom Material Alert Dialog Style -->
+    <style name="MaterialAlertDialog_Custom" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/CustomAlertDialogStyle</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/CustomAlertDialogTitle</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/CustomAlertDialogBody</item>
+        <item name="buttonBarPositiveButtonStyle">@style/CustomAlertDialogPositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/CustomAlertDialogNegativeButton</item>
+    </style>
+
+    <!-- Alert Dialog Container Style -->
+    <style name="CustomAlertDialogStyle" parent="MaterialAlertDialog.Material3">
+        <item name="shapeAppearance">@style/CustomAlertDialogShape</item>
+        <item name="backgroundTint">#FFFFFF</item>
+        <item name="android:elevation">24dp</item>
+    </style>
+
+    <!-- Alert Dialog Shape -->
+    <style name="CustomAlertDialogShape" parent="ShapeAppearance.Material3.Corner.Large">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <!-- Alert Dialog Title Style -->
+    <style name="CustomAlertDialogTitle" parent="MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textColor">#1565C0</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Alert Dialog Body Style -->
+    <style name="CustomAlertDialogBody" parent="MaterialAlertDialog.Material3.Body.Text">
+        <item name="android:textColor">#424242</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <!-- Positive Button Style -->
+    <style name="CustomAlertDialogPositiveButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">#42A5F5</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <!-- Negative Button Style -->
+    <style name="CustomAlertDialogNegativeButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">#757575</item>
+        <item name="android:textStyle">normal</item>
+        <item name="rippleColor">#E0E0E0</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
+
+    <!-- Text Input Layout Style -->
+    <style name="CustomTextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">#42A5F5</item>
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="hintTextColor">#42A5F5</item>
+        <item name="android:textColorHint">#9E9E9E</item>
+        <item name="boxCornerRadiusTopStart">16dp</item>
+        <item name="boxCornerRadiusTopEnd">16dp</item>
+        <item name="boxCornerRadiusBottomStart">16dp</item>
+        <item name="boxCornerRadiusBottomEnd">16dp</item>
+    </style>
+
+    <!-- Floating Action Button Style -->
+    <style name="CustomFAB" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="backgroundTint">#42A5F5</item>
+        <item name="tint">#FFFFFF</item>
+        <item name="elevation">12dp</item>
+        <item name="borderWidth">0dp</item>
+        <item name="rippleColor">#BBDEFB</item>
+    </style>
+
+    <!-- Card View Style -->
+    <style name="CustomCardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">18dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="cardBackgroundColor">#FFFFFF</item>
+        <item name="strokeColor">#E3F2FD</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Material Button Styles -->
+    <style name="PrimaryButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">#42A5F5</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="cornerRadius">28dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="elevation">4dp</item>
+        <item name="rippleColor">#BBDEFB</item>
+    </style>
+
+    <style name="SecondaryButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">#757575</item>
+        <item name="cornerRadius">28dp</item>
+        <item name="rippleColor">#E0E0E0</item>
+    </style>
+
+    <!-- Icon Button Styles -->
+    <style name="EditIconButton" parent="Widget.Material3.Button.IconButton">
+        <item name="backgroundTint">#E3F2FD</item>
+        <item name="iconTint">#1976D2</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="rippleColor">#BBDEFB</item>
+    </style>
+
+    <style name="DeleteIconButton" parent="Widget.Material3.Button.IconButton">
+        <item name="backgroundTint">#FFEBEE</item>
+        <item name="iconTint">#D32F2F</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="rippleColor">#FFCDD2</item>
+    </style>
+</resources>
