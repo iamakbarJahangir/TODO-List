@@ -1,117 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
     android:layout_marginVertical="8dp"
-    android:checkable="true"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="18dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="24dp"
     app:cardElevation="8dp"
-    app:strokeColor="#E3F2FD"
-    app:strokeWidth="1dp">
+    app:strokeWidth="0dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:background="#4354A0"
         android:padding="20dp">
 
-        <!-- Completion Checkbox with better styling -->
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/cb_is_completed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:buttonTint="#4CAF50"
-            android:contentDescription="@string/complete_task_description"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:scaleX="1.2"
-            android:scaleY="1.2" />
+            android:scaleY="1.2"
+            app:buttonTint="@android:color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Task Content with better spacing -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <!-- Task Title with emoji support -->
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp"
-                android:ellipsize="end"
-                android:lineSpacingExtra="2dp"
-                android:maxLines="2"
-                android:text="@string/sample_task_title"
-                android:textColor="#1A1A1A"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <!-- Task Description with better visibility -->
-            <TextView
-                android:id="@+id/tv_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:lineSpacingExtra="1dp"
-                android:maxLines="3"
-                android:text="@string/sample_task_description"
-                android:textColor="#666666"
-                android:textSize="14sp"
-                android:visibility="visible" />
-        </LinearLayout>
-
-        <!-- Action Buttons with modern Material Design -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/sample_task_title"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/btn_edit"
+            app:layout_constraintStart_toEndOf="@+id/cb_is_completed"
+            app:layout_constraintTop_toTopOf="@+id/cb_is_completed"
+            app:layout_constraintBottom_toTopOf="@+id/tv_description"/>
 
-            <!-- Edit Button with Material 3 style -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_edit"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="@string/edit_task_description"
-                app:icon="@drawable/ic_edit"
-                app:iconTint="#1976D2"
-                app:backgroundTint="#E3F2FD"
-                app:cornerRadius="24dp"
-                app:rippleColor="#BBDEFB" />
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/sample_task_description"
+            android:textColor="#E0E0E0"
+            android:textSize="14sp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="@+id/tv_title"
+            app:layout_constraintStart_toStartOf="@+id/tv_title"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title" />
 
-            <!-- Delete Button with Material 3 style -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_delete"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@string/delete_task_description"
-                app:icon="@drawable/ic_delete"
-                app:iconTint="#D32F2F"
-                app:backgroundTint="#FFEBEE"
-                app:cornerRadius="24dp"
-                app:rippleColor="#FFCDD2" />
-        </LinearLayout>
-    </LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_edit"
+            style="@style/Widget.Material3.Button.IconButton.Filled"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="Edit Task"
+            app:backgroundTint="#33FFFFFF"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_edit"
+            app:iconTint="@android:color/holo_green_light"
+            app:layout_constraintBottom_toTopOf="@+id/btn_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"/>
 
-    <!-- Optional: Status indicator bar at bottom -->
-    <View
-        android:id="@+id/status_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/task_status_gradient"
-        android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_delete"
+            style="@style/Widget.Material3.Button.IconButton.Filled"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="Delete Task"
+            app:backgroundTint="#33FFFFFF"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_delete"
+            app:iconTint="@android:color/holo_red_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/btn_edit"
+            app:layout_constraintStart_toStartOf="@+id/btn_edit"
+            app:layout_constraintTop_toBottomOf="@+id/btn_edit" />
 
+        <TextView
+            android:id="@+id/tv_reminder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/reminder_background"
+            android:drawableStart="@drawable/ic_alarm_small"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:drawableTint="#FFFFFF"
+            app:layout_constraintTop_toBottomOf="@+id/tv_description"
+            app:layout_constraintStart_toStartOf="@+id/tv_title"
+            app:layout_constraintEnd_toEndOf="@+id/tv_title"  tools:text="Reminder: Tomorrow at 10:00 AM"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

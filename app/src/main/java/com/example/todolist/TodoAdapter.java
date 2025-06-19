@@ -7,16 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.button.MaterialButton;
 
-import java.text.SimpleDateFormat;
+// =========== NEW IMPORTS START ===========
+import java.text.DateFormat;
 import java.util.Date;
+// =========== NEW IMPORTS END ===========
 import java.util.List;
-import java.util.Locale;
 
 public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder> {
 
@@ -59,7 +58,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
         private TextView tvDescription;
         private MaterialButton btnEdit;
         private MaterialButton btnDelete;
-        private View statusIndicator;
+        // =========== NEW VIEW START ===========
+        private TextView tvReminder;
+        // =========== NEW VIEW END ===========
 
         public TodoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,14 +70,14 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
             tvDescription = itemView.findViewById(R.id.tv_description);
             btnEdit = itemView.findViewById(R.id.btn_edit);
             btnDelete = itemView.findViewById(R.id.btn_delete);
-            statusIndicator = itemView.findViewById(R.id.status_indicator);
+            // =========== NEW VIEW FIND START ===========
+            tvReminder = itemView.findViewById(R.id.tv_reminder);
+            // =========== NEW VIEW FIND END ===========
         }
 
         public void bind(Task task) {
-            // Set task title
             tvTitle.setText(task.getTitle());
 
-            // Set task description
             if (TextUtils.isEmpty(task.getDescription())) {
                 tvDescription.setVisibility(View.GONE);
             } else {
@@ -84,115 +85,50 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
                 tvDescription.setText(task.getDescription());
             }
 
-            // Set completion status
-            cbIsCompleted.setOnCheckedChangeListener(null); // Remove listener temporarily
+            cbIsCompleted.setOnCheckedChangeListener(null);
             cbIsCompleted.setChecked(task.isCompleted());
-
-            // Apply completion styling
             updateCompletionStyling(task.isCompleted());
 
-            // Set status indicator
-            if (task.isCompleted()) {
-                statusIndicator.setVisibility(View.VISIBLE);
-                statusIndicator.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_green_light));
+            // =========== BIND REMINDER DATA START ===========
+            if (task.getReminderTimestamp() > 0 && !task.isCompleted()) {
+                String formattedDate = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+                        .format(new Date(task.getReminderTimestamp()));
+                tvReminder.setText(itemView.getContext().getString(R.string.reminder_set_for, formattedDate));
+                tvReminder.setVisibility(View.VISIBLE);
             } else {
-                statusIndicator.setVisibility(View.GONE);
+                tvReminder.setVisibility(View.GONE);
             }
+            // =========== BIND REMINDER DATA END ===========
 
-            // Set click listeners
             cbIsCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (listener != null) {
                     listener.onTaskComplete(task, isChecked);
-                    updateCompletionStyling(isChecked);
                 }
             });
 
             btnEdit.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onTaskEdit(task);
-                }
+                if (listener != null) listener.onTaskEdit(task);
             });
 
             btnDelete.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onTaskDelete(task);
-                }
-            });
-
-            // Add click listener to entire card
-            itemView.setOnClickListener(v -> {
-                // Toggle completion status when card is clicked
-                boolean newStatus = !task.isCompleted();
-                cbIsCompleted.setChecked(newStatus);
-                if (listener != null) {
-                    listener.onTaskComplete(task, newStatus);
-                }
-            });
-
-            // Add long click listener for additional actions
-            itemView.setOnLongClickListener(v -> {
-                if (listener != null) {
-                    listener.onTaskEdit(task);
-                }
-                return true;
+                if (listener != null) listener.onTaskDelete(task);
             });
         }
 
         private void updateCompletionStyling(boolean isCompleted) {
             if (isCompleted) {
-                // Apply strikethrough and reduce opacity
                 tvTitle.setPaintFlags(tvTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 tvDescription.setPaintFlags(tvDescription.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 tvTitle.setAlpha(0.6f);
                 tvDescription.setAlpha(0.6f);
-
-                // Update status indicator
-                statusIndicator.setVisibility(View.VISIBLE);
-                statusIndicator.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_green_light));
+                // Hide reminder if task is completed
+                tvReminder.setVisibility(View.GONE);
             } else {
-                // Remove strikethrough and restore opacity
                 tvTitle.setPaintFlags(tvTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                 tvDescription.setPaintFlags(tvDescription.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                 tvTitle.setAlpha(1.0f);
                 tvDescription.setAlpha(1.0f);
-
-                // Hide status indicator
-                statusIndicator.setVisibility(View.GONE);
             }
-        }
-    }
-
-    // Helper method to format timestamp (optional)
-    private String formatTimestamp(long timestamp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-        return sdf.format(new Date(timestamp));
-    }
-
-    // Method to update the task list
-    public void updateTaskList(List<Task> newTaskList) {
-        this.taskList = newTaskList;
-        notifyDataSetChanged();
-    }
-
-    // Method to add a single task
-    public void addTask(Task task) {
-        taskList.add(0, task); // Add to beginning
-        notifyItemInserted(0);
-    }
-
-    // Method to remove a task
-    public void removeTask(int position) {
-        if (position >= 0 && position < taskList.size()) {
-            taskList.remove(position);
-            notifyItemRemoved(position);
-        }
-    }
-
-    // Method to update a task
-    public void updateTask(int position, Task updatedTask) {
-        if (position >= 0 && position < taskList.size()) {
-            taskList.set(position, updatedTask);
-            notifyItemChanged(position);
         }
     }
 }

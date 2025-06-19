@@ -1,5 +1,8 @@
 package com.example.todolist;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,12 +20,14 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.FirebaseNetworkException;
+import com.google.firebase.auth.FirebaseAuthException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class SignUpFragment extends Fragment {
 
@@ -35,11 +40,6 @@ public class SignUpFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private boolean isLoading = false;
-
-    // Password validation pattern - at least 8 chars with uppercase, lowercase, number, and special char
-    private static final Pattern PASSWORD_PATTERN = Pattern.compile(
-            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$"
-    );
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,6 +78,7 @@ public class SignUpFragment extends Fragment {
     }
 
     private TextInputLayout findTextInputLayout(View editText) {
+        if (editText == null) return null;
         View parent = (View) editText.getParent();
         while (parent != null && !(parent instanceof TextInputLayout)) {
             parent = (View) parent.getParent();
@@ -88,9 +89,29 @@ public class SignUpFragment extends Fragment {
     private void setupClickListeners() {
         submitButton.setOnClickListener(v -> {
             if (!isLoading) {
+                // Check network connectivity first
+                if (!isNetworkAvailable()) {
+                    showToast("No internet connection. Please check your network settings.");
+                    return;
+                }
                 validateAndSignUp();
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager)
+                    getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            if (connectivityManager != null) {
+                NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking network connectivity", e);
+        }
+        return false;
     }
 
     private void validateAndSignUp() {
@@ -112,9 +133,6 @@ public class SignUpFragment extends Fragment {
         } else if (name.length() < 2) {
             setError(nameLayout, "Name must be at least 2 characters");
             isValid = false;
-        } else if (!name.matches("^[a-zA-Z\\s]+$")) {
-            setError(nameLayout, "Name can only contain letters and spaces");
-            isValid = false;
         }
 
         // Username validation
@@ -126,9 +144,6 @@ public class SignUpFragment extends Fragment {
             isValid = false;
         } else if (username.length() > 20) {
             setError(usernameLayout, "Username must be less than 20 characters");
-            isValid = false;
-        } else if (!username.matches("^[a-zA-Z0-9_]+$")) {
-            setError(usernameLayout, "Username can only contain letters, numbers, and underscores");
             isValid = false;
         }
 
@@ -145,11 +160,8 @@ public class SignUpFragment extends Fragment {
         if (TextUtils.isEmpty(password)) {
             setError(passwordLayout, "Password is required");
             isValid = false;
-        } else if (password.length() < 8) {
-            setError(passwordLayout, "Password must be at least 8 characters");
-            isValid = false;
-        } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            setError(passwordLayout, "Password must contain uppercase, lowercase, number, and special character");
+        } else if (password.length() < 6) {
+            setError(passwordLayout, "Password must be at least 6 characters");
             isValid = false;
         }
 
@@ -169,44 +181,13 @@ public class SignUpFragment extends Fragment {
         }
 
         if (isValid) {
-            checkUsernameAvailability(username, () -> signUpUser(name, username, email, password));
+            signUpUser(name, username, email, password);
         }
-    }
-
-    private void checkUsernameAvailability(String username, Runnable onSuccess) {
-        Log.d(TAG, "Checking username availability for: " + username);
-        setLoading(true);
-
-        db.collection("users")
-                .whereEqualTo("username", username)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        if (task.getResult().isEmpty()) {
-                            Log.d(TAG, "Username available, proceeding with signup");
-                            // Don't set loading false here, let signUpUser handle it
-                            onSuccess.run();
-                        } else {
-                            Log.d(TAG, "Username already taken");
-                            setLoading(false);
-                            setError(usernameLayout, "Username is already taken");
-                        }
-                    } else {
-                        Log.e(TAG, "Error checking username availability", task.getException());
-                        setLoading(false);
-                        showToast("Error checking username availability");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to check username availability", e);
-                    setLoading(false);
-                    showToast("Error checking username: " + e.getMessage());
-                });
     }
 
     private void signUpUser(String name, String username, String email, String password) {
         Log.d(TAG, "Creating user account for email: " + email);
-        // Loading is already set in checkUsernameAvailability
+        setLoading(true);
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -227,16 +208,16 @@ public class SignUpFragment extends Fragment {
                                             saveUserDataToFirestore(user.getUid(), name, username, email);
                                         } else {
                                             Log.e(TAG, "Failed to update profile", profileTask.getException());
-                                            handleSignupCompletion("Account created! Please sign in.", true);
+                                            handleSignupCompletion("Account created successfully! Please sign in.", false);
                                         }
                                     })
                                     .addOnFailureListener(e -> {
-                                        Log.e(TAG, "Failed to update profile", e);
-                                        handleSignupCompletion("Account created! Please sign in.", true);
+                                        Log.e(TAG, "Profile update failed", e);
+                                        handleSignupCompletion("Account created successfully! Please sign in.", false);
                                     });
                         } else {
                             Log.e(TAG, "Failed to get user information after account creation");
-                            handleSignupCompletion("Account created! Please sign in.", true);
+                            handleSignupCompletion("Account created successfully! Please sign in.", false);
                         }
                     } else {
                         Log.e(TAG, "Failed to create Firebase Auth account", task.getException());
@@ -248,7 +229,8 @@ public class SignUpFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Registration failed with exception", e);
                     setLoading(false);
-                    showToast("Registration failed: " + e.getMessage());
+                    String errorMessage = getFirebaseErrorMessage(e);
+                    showToast(errorMessage);
                 });
     }
 
@@ -269,23 +251,25 @@ public class SignUpFragment extends Fragment {
                         handleSignupCompletion("Account created successfully! Please sign in.", false);
                     } else {
                         Log.e(TAG, "Failed to save user data to Firestore", task.getException());
-                        handleSignupCompletion("Account created! Please sign in.", true);
+                        // Even if Firestore fails, the account was created successfully
+                        handleSignupCompletion("Account created successfully! Please sign in.", false);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Exception while saving user data to Firestore", e);
-                    handleSignupCompletion("Account created! Please sign in.", true);
+                    Log.e(TAG, "Firestore save failed", e);
+                    // Even if Firestore fails, the account was created successfully
+                    handleSignupCompletion("Account created successfully! Please sign in.", false);
                 });
     }
 
-    private void handleSignupCompletion(String message, boolean forceSignOut) {
+    private void handleSignupCompletion(String message, boolean hasError) {
         Log.d(TAG, "Handling signup completion: " + message);
 
         // Always set loading to false first
         setLoading(false);
 
-        // Sign out user (either forced or normal flow)
-        if (forceSignOut || mAuth.getCurrentUser() != null) {
+        // Sign out user after successful registration so they can sign in
+        if (mAuth.getCurrentUser() != null && !hasError) {
             mAuth.signOut();
             Log.d(TAG, "User signed out after account creation");
         }
@@ -296,34 +280,62 @@ public class SignUpFragment extends Fragment {
         // Clear form
         clearForm();
 
-        // Add a small delay to ensure UI updates are processed
-        if (getView() != null) {
+        // Switch to sign in tab after a short delay
+        if (getView() != null && !hasError) {
             getView().postDelayed(() -> {
-                // Switch to sign in tab (login fragment)
                 if (getActivity() instanceof MainActivity && !isDetached() && isAdded()) {
                     Log.d(TAG, "Switching to login tab");
                     ((MainActivity) getActivity()).switchToTab(0);
                 }
-            }, 100); // 100ms delay
+            }, 1500); // 1.5 second delay to show the success message
         }
     }
 
     private String getFirebaseErrorMessage(Exception exception) {
-        if (exception == null) return "Registration failed";
+        if (exception == null) return "Registration failed. Please try again.";
 
         String exceptionMessage = exception.getMessage();
-        if (exceptionMessage != null) {
-            if (exceptionMessage.contains("email-already-in-use")) {
-                return "This email is already registered";
-            } else if (exceptionMessage.contains("weak-password")) {
-                return "Password is too weak";
-            } else if (exceptionMessage.contains("invalid-email")) {
-                return "Invalid email address";
-            } else if (exceptionMessage.contains("operation-not-allowed")) {
-                return "Email/password accounts are not enabled";
+        Log.e(TAG, "Firebase error: " + exceptionMessage);
+
+        // Handle specific Firebase exceptions
+        if (exception instanceof FirebaseNetworkException) {
+            return "Network error. Please check your internet connection and try again.";
+        }
+
+        if (exception instanceof FirebaseAuthException) {
+            FirebaseAuthException authException = (FirebaseAuthException) exception;
+            String errorCode = authException.getErrorCode();
+
+            switch (errorCode) {
+                case "ERROR_EMAIL_ALREADY_IN_USE":
+                    return "This email is already registered. Please use a different email or sign in.";
+                case "ERROR_WEAK_PASSWORD":
+                    return "Password is too weak. Please use a stronger password.";
+                case "ERROR_INVALID_EMAIL":
+                    return "Invalid email address format.";
+                case "ERROR_OPERATION_NOT_ALLOWED":
+                    return "Email/password accounts are not enabled. Please contact support.";
+                case "ERROR_NETWORK_REQUEST_FAILED":
+                    return "Network error. Please check your internet connection and try again.";
+                default:
+                    return "Registration failed: " + authException.getMessage();
             }
         }
-        return "Registration failed";
+
+        if (exceptionMessage != null) {
+            if (exceptionMessage.contains("email-already-in-use")) {
+                return "This email is already registered. Please use a different email or sign in.";
+            } else if (exceptionMessage.contains("weak-password")) {
+                return "Password is too weak. Please use a stronger password.";
+            } else if (exceptionMessage.contains("invalid-email")) {
+                return "Invalid email address format.";
+            } else if (exceptionMessage.contains("operation-not-allowed")) {
+                return "Email/password accounts are not enabled. Please contact support.";
+            } else if (exceptionMessage.contains("network") || exceptionMessage.contains("timeout")) {
+                return "Network error. Please check your internet connection and try again.";
+            }
+        }
+        return "Registration failed: " + (exceptionMessage != null ? exceptionMessage : "Unknown error");
     }
 
     private void setError(TextInputLayout layout, String error) {
